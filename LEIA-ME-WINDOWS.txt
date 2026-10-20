@@ -1,0 +1,31 @@
+ROTINA DE RESERVAS - WINDOWS
+
+1. Instale Python 3.12 de 64 bits pelo site oficial:
+   https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe
+   Inclua o Python Launcher (comando py) na instalacao.
+   Se a empresa restringir instalacoes, solicite apoio ao TI.
+
+2. Extraia TODOS os arquivos do ZIP para uma pasta do computador.
+   Nao execute os arquivos de dentro do ZIP.
+
+3. Abra instalar.bat e aguarde a mensagem de conclusao.
+   Esta etapa precisa de internet para baixar as dependencias.
+
+4. Para usar, abra iniciar.bat e acesse http://localhost:8501
+   no navegador desse computador. Mantenha a janela aberta.
+   Para encerrar, volte a janela e pressione Ctrl+C.
+
+5. Envie as planilhas Atual e Reserva, selecione as abas corretas
+   e baixe o ZIP com os resultados. A primeira linha tem os cabecalhos
+   e a coluna B deve conter o pedido. A aba modelo e a padrao da Reserva.
+
+O texto ja vem com o modelo solicitado. A introducao aparece uma unica
+vez e os dados se repetem por pedido somente na Reserva. A frase sobre
+10 dias e parte do modelo; o programa nao aplica filtro por idade.
+
+Os arquivos sao processados na memoria do computador, sem envio para
+um servico externo pelo aplicativo. Os resultados usam XLSX e nao
+reproduzem a formatacao original. Nao ha exclusao em sistemas externos.
+
+Pacote validado em Linux. Os scripts BAT precisam de verificacao no seu
+Windows; caso apareca um erro, envie a mensagem para obter ajuda.
