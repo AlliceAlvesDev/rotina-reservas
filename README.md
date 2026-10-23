@@ -2,6 +2,8 @@
 
 Aplicação local para comparar pedidos em arquivos XLS, XLSX e ODS. Envie a Atual e a Reserva, selecione as abas e baixe os resultados em ZIP. Os arquivos enviados não são gravados pelo aplicativo.
 
+Para usar pelo navegador sem instalar Python na máquina dos usuários, veja [HOSPEDAGEM.md](HOSPEDAGEM.md).
+
 ## Executar
 
 No Windows, instale Python 3.12 de 64 bits com o Python Launcher, extraia o ZIP do GitHub e abra `instalar.bat`. Depois abra `iniciar.bat`. Veja `LEIA-ME-WINDOWS.txt` para o passo a passo.
