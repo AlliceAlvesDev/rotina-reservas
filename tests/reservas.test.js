@@ -29,3 +29,32 @@ test('biblioteca le XLS, XLSX e ODS e exporta valores como texto', () => {
     assert.deepEqual(X.utils.sheet_to_json(read.Sheets.modelo, {header: 1, raw: false}), rows); assert.equal(read.Sheets.modelo.C2.f, undefined);
   }
 });
+test('separa mensagens pela combinacao loja D e local E com introducao por canal', () => {
+  const rows = [
+    ['01/10/26', '101', 'Cliente: A', '0001', '28'],
+    ['02/10/26', '102', 'Cliente: B', '0001', '58'],
+    ['03/10/26', '103', 'Cliente: C', '0002', '28'],
+    ['04/10/26', '104', 'Cliente: D', ' 0001 ', '28'],
+  ];
+  const text = R.textos(rows, R.INTRO, R.MODELO);
+  const groups = text.split('\n\n========================================\n\n');
+  assert.equal(groups.length, 3);
+  assert.ok(groups[0].startsWith('Loja origem: 0001\nLocal origem: 28\n\nBom dia!'));
+  assert.ok(groups[0].includes('Pedido: 101\n'));
+  assert.ok(groups[0].includes('Pedido: 104\n'));
+  assert.ok(!groups[0].includes('Pedido: 102\n'));
+  assert.ok(!groups[0].includes('Pedido: 103\n'));
+  assert.ok(groups[1].startsWith('Loja origem: 0001\nLocal origem: 58'));
+  assert.ok(groups[1].includes('Pedido: 102\n'));
+  assert.ok(groups[2].startsWith('Loja origem: 0002\nLocal origem: 28'));
+  assert.ok(groups[2].includes('Pedido: 103\n'));
+  assert.equal(text.split('Bom dia!').length - 1, 3);
+  assert.equal(text.split('Pedido: ').length - 1, 4);
+  assert.equal(R.textos(rows, '', 'Pedido {pedido} / {D} / {E}').includes('Bom dia!'), false);
+});
+test('campos de origem vazios sao identificados sem perder pedidos', () => {
+  const text = R.textos([['data', '1', 'Cliente'], ['data', '2', 'Cliente', '0001', '']], '', R.MODELO);
+  assert.ok(text.includes('Loja origem: Não informada\nLocal origem: Não informado'));
+  assert.ok(text.includes('Loja origem: 0001\nLocal origem: Não informado'));
+  assert.equal(text.split('Pedido: ').length - 1, 2);
+});

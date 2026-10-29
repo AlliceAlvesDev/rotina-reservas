@@ -33,12 +33,20 @@
       if (!fields.has(match[1])) throw new Error('Campo desconhecido no modelo: ' + match[1]);
     }
     if (!rows.length || !model.trim()) return '';
-    const blocks = rows.map(row => {
+    const groups = new Map();
+    rows.forEach(row => {
+      const loja = String(row[3] == null ? '' : row[3]).trim();
+      const local = String(row[4] == null ? '' : row[4]).trim();
+      const key = JSON.stringify([loja, local]);
+      if (!groups.has(key)) groups.set(key, {loja, local, blocks: []});
       const values = {pedido: pedido(row[1]), data: String(row[0] || ''), cliente: String(row[2] || '').replace(/^\s*Cliente\s*:\s*/i, '')};
       [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].forEach((letter, i) => { values[letter] = String(row[i] == null ? '' : row[i]); });
-      return model.replace(/\{([^{}]+)\}/g, (_, name) => values[name]);
+      groups.get(key).blocks.push(model.replace(/\{([^{}]+)\}/g, (_, name) => values[name]));
     });
-    return (intro.trim() ? intro.trim() + '\n\n' : '') + blocks.join('\n\n');
+    return [...groups.values()].map(group => {
+      const heading = 'Loja origem: ' + (group.loja || 'Não informada') + '\nLocal origem: ' + (group.local || 'Não informado');
+      return heading + '\n\n' + (intro.trim() ? intro.trim() + '\n\n' : '') + group.blocks.join('\n\n');
+    }).join('\n\n========================================\n\n');
   }
   const api = {INTRO, MODELO, pedido, limpar, comparar, textos};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
