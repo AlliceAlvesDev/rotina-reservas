@@ -4,25 +4,11 @@ Aplicação para comparar pedidos em arquivos XLS, XLSX e ODS, remover repetiç�
 
 ## Windows sem Python
 
-Baixe o ZIP do repositório, extraia tudo e abra **iniciar.bat**. O PowerShell inicia um servidor restrito à própria máquina e abre o Chrome, ou o navegador padrão. A comparação acontece no navegador, sem enviar as planilhas ao servidor. Todas as bibliotecas já estão incluídas; não precisa de internet durante o uso. Não execute `instalar.bat` para esta versão. Veja [LEIA-ME-WINDOWS.txt](LEIA-ME-WINDOWS.txt).
+Baixe o ZIP do repositório, extraia tudo e abra **iniciar.bat**. O PowerShell inicia um servidor restrito à própria máquina e abre o Chrome, ou o navegador padrão. A comparação acontece no navegador, sem enviar as planilhas ao servidor. Todas as bibliotecas já estão incluídas; não precisa de internet durante o uso. Veja [LEIA-ME-WINDOWS.txt](LEIA-ME-WINDOWS.txt).
 
 A interface usa a porta 8502, oferece downloads XLSX separados e mensagem TXT. Limites: 15 MB por arquivo e 100 mil linhas por aba. Não há upload HTTP de planilhas nem exclusão em sistemas externos.
 
 Arquivos da versão sem Python: `iniciar.bat`, `Servidor-Reservas.ps1` e `public/`. A biblioteca SheetJS CE 0.20.3 está incluída em `public/vendor/`, com licença, origem e integridade do pacote de distribuição. Testes da lógica e dos formatos: `node --test tests/reservas.test.js` (Node é necessário apenas para desenvolvimento/testes).
-
-Para usar pelo navegador sem instalar Python na máquina dos usuários, veja [HOSPEDAGEM.md](HOSPEDAGEM.md).
-
-## Versão Python alternativa
-
-Se preferir a versão Streamlit, instale Python 3.12 de 64 bits. No Windows, `instalar.bat` prepara as dependências; depois execute `.venv\Scripts\python.exe -m streamlit run app.py --server.address 127.0.0.1`. Essa versão oferece download ZIP com todos os resultados.
-
-Requer Python 3.11 ou superior.
-
-```sh
-python -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8501
-```
 
 ## Regras
 
@@ -30,12 +16,12 @@ python -m venv .venv
 - Números inteiros, texto numérico, espaços e zeros à esquerda são normalizados para comparação. A primeira linha de cada pedido é mantida.
 - Linhas sem pedido são preservadas e sinalizadas; não entram na comparação. Pedidos inválidos interrompem a operação para evitar usar uma coluna incorreta.
 - Somente na Reserva e somente na Atual são calculados depois da deduplicação. As diferenças não são apagadas automaticamente.
-- O ZIP contém as duas planilhas limpas e um relatório com diferenças e linhas removidas, em XLSX. São exportados os valores das abas selecionadas, sem preservar formatação, fórmulas, macros ou demais abas.
+- Há downloads separados para as duas planilhas limpas e o relatório com diferenças e linhas removidas, em XLSX. São exportados os valores das abas selecionadas, sem preservar formatação, fórmulas, macros ou demais abas.
 - A mensagem começa com a saudação e o aviso fornecidos pelo usuário, uma única vez. Depois repete Pedido, Data e Cliente para cada pedido somente na Reserva. `{pedido}` usa o número normalizado, `{data}` a coluna A e `{cliente}` a coluna C sem o prefixo "Cliente:". `{A}`, `{B}`, `{C}` etc. usam os valores originais da linha na Reserva. A introdução e o bloco podem ser editados na aplicação. A comparação não aplica filtro adicional de idade da reserva.
 - Nenhuma reserva é excluída de um sistema externo.
 
 ## Testes
 
 ```sh
-.venv/bin/python -m unittest discover -s tests -v
+node --test tests/reservas.test.js
 ```

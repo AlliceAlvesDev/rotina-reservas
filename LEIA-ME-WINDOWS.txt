@@ -3,7 +3,7 @@ ROTINA DE RESERVAS - WINDOWS - SEM PYTHON
 1. Baixe o ZIP atualizado pelo GitHub e extraia TODOS os arquivos
    para uma pasta. Nao execute os arquivos de dentro do ZIP.
 
-2. Abra iniciar.bat. Nao e necessario executar instalar.bat.
+2. Abra iniciar.bat.
    O PowerShell inicia o servidor local e abre o Chrome automaticamente.
    Se o Chrome nao estiver instalado, usa o navegador padrao.
    Nao precisa instalar Python, Node.js, Excel ou dependencias.
@@ -37,6 +37,3 @@ politicas nem tenta contornar bloqueios.
 
 A leitura, comparacao, interface e downloads sao testados em Linux.
 O iniciador do Windows deve ser conferido na maquina de destino.
-
-app.py, instalar.bat e requirements.txt sao da versao Python anterior,
-que continua disponivel como alternativa.
