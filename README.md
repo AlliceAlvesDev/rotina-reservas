@@ -1,12 +1,20 @@
 # Rotina de reservas
 
-Aplicação local para comparar pedidos em arquivos XLS, XLSX e ODS. Envie a Atual e a Reserva, selecione as abas e baixe os resultados em ZIP. Os arquivos enviados não são gravados pelo aplicativo.
+Aplicação para comparar pedidos em arquivos XLS, XLSX e ODS, remover repetições e gerar a mensagem para os pedidos somente na Reserva.
+
+## Windows sem Python
+
+Baixe o ZIP do repositório, extraia tudo e abra **iniciar.bat**. O PowerShell inicia um servidor restrito à própria máquina e abre o Chrome, ou o navegador padrão. A comparação acontece no navegador, sem enviar as planilhas ao servidor. Todas as bibliotecas já estão incluídas; não precisa de internet durante o uso. Não execute `instalar.bat` para esta versão. Veja [LEIA-ME-WINDOWS.txt](LEIA-ME-WINDOWS.txt).
+
+A interface usa a porta 8502, oferece downloads XLSX separados e mensagem TXT. Limites: 15 MB por arquivo e 100 mil linhas por aba. Não há upload HTTP de planilhas nem exclusão em sistemas externos.
+
+Arquivos da versão sem Python: `iniciar.bat`, `Servidor-Reservas.ps1` e `public/`. A biblioteca SheetJS CE 0.20.3 está incluída em `public/vendor/`, com licença, origem e integridade do pacote de distribuição. Testes da lógica e dos formatos: `node --test tests/reservas.test.js` (Node é necessário apenas para desenvolvimento/testes).
 
 Para usar pelo navegador sem instalar Python na máquina dos usuários, veja [HOSPEDAGEM.md](HOSPEDAGEM.md).
 
-## Executar
+## Versão Python alternativa
 
-No Windows, instale Python 3.12 de 64 bits com o Python Launcher, extraia o ZIP do GitHub e abra `instalar.bat`. Depois abra `iniciar.bat`. Veja `LEIA-ME-WINDOWS.txt` para o passo a passo.
+Se preferir a versão Streamlit, instale Python 3.12 de 64 bits. No Windows, `instalar.bat` prepara as dependências; depois execute `.venv\Scripts\python.exe -m streamlit run app.py --server.address 127.0.0.1`. Essa versão oferece download ZIP com todos os resultados.
 
 Requer Python 3.11 ou superior.
 

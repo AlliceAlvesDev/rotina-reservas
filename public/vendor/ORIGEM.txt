@@ -1,0 +1,5 @@
+SheetJS Community Edition 0.20.3
+Distribuicao: @e965/xlsx 0.20.3 (espelho npm)
+https://registry.npmjs.org/@e965/xlsx/-/xlsx-0.20.3.tgz
+Integridade do pacote verificada: sha512-703RN/3OdsRD5mtse2HBX7Um7xwaP9tlswEG6svOtjqokXoX7rJdQj7DyabD2I+xk22RgaIIU+R6BHgkpZGB/w==
+Licenca: Apache-2.0, consulte LICENSE-SheetJS.txt
