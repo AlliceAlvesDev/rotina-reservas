@@ -13,6 +13,29 @@ test('deduplica, preserva linhas sem pedido e compara os dois lados', () => {
   const r = R.comparar([['data', '01'], ['outra', '1.0'], ['data', '2'], ['sem', ''], ['sem2', '']], [['data', '1'], ['data', '3'], ['data', '03']]);
   assert.equal(r.atual.length, 4); assert.equal(r.removidasAtual.length, 1); assert.equal(r.removidasReserva.length, 1); assert.equal(r.vazias, 2);
   assert.deepEqual(r.somenteAtual.map(row => row[1]), ['2']); assert.deepEqual(r.somenteReserva.map(row => row[1]), ['3']);
+  assert.deepEqual(r.atualNaReserva, [['data', '01']]);
+});
+test('Atual exportada mantem somente pedidos da Reserva enviada e os dados originais', () => {
+  const atual = [['data A', '00123', 'Cliente A', '0001', '28'], ['repetida', '123.0'], ['data B', '456', 'Cliente B'], ['data C', '789', 'Cliente C']];
+  const reserva = [['outra data', ' 123 ', 'Outro dado'], ['data', '789'], ['data', '999']];
+  const r = R.comparar(atual, reserva);
+  assert.deepEqual(r.atualNaReserva, [atual[0], atual[3]]);
+  assert.deepEqual(r.somenteAtual, [atual[2]]);
+  assert.deepEqual(r.somenteReserva, [reserva[2]]);
+  assert.equal(r.removidasAtual.length, 1);
+  const chavesReserva = new Set(r.reserva.map(row => R.pedido(row[1])));
+  assert.ok(r.atualNaReserva.every(row => chavesReserva.has(R.pedido(row[1]))));
+  // Uma nova Reserva deve recalcular o filtro, sem reutilizar pedidos antigos.
+  assert.deepEqual(R.comparar(atual, [reserva[1]]).atualNaReserva, [atual[3]]);
+});
+test('Reserva vazia ou sem pedidos em comum produz Atual filtrada vazia, mantendo diferencas', () => {
+  const atual = [['data', '123'], ['sem pedido', '']];
+  for (const reserva of [[], [['data', '999']], [['sem pedido', '']]]) {
+    const r = R.comparar(atual, reserva);
+    assert.deepEqual(r.atualNaReserva, []);
+    assert.deepEqual(r.somenteAtual, [atual[0]]);
+    assert.deepEqual(r.atual, atual);
+  }
 });
 test('introducao unica, cliente sem prefixo e campos editaveis', () => {
   const rows = [['01/10/26', '12', 'Cliente: Exemplo A'], ['02/10/26', '13', 'Exemplo B']];

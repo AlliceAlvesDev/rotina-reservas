@@ -15,7 +15,8 @@ Arquivos da versão sem Python: `iniciar.bat`, `Servidor-Reservas.ps1` e `public
 - A primeira linha contém cabeçalhos; o pedido está na coluna B.
 - Números inteiros, texto numérico, espaços e zeros à esquerda são normalizados para comparação. A primeira linha de cada pedido é mantida.
 - Linhas sem pedido são preservadas e sinalizadas; não entram na comparação. Pedidos inválidos interrompem a operação para evitar usar uma coluna incorreta.
-- Somente na Reserva e somente na Atual são calculados depois da deduplicação. As diferenças não são apagadas automaticamente.
+- Somente na Reserva e somente na Atual são calculados depois da deduplicação, usando os arquivos enviados antes do filtro de exportação.
+- `atual_sem_duplicatas.xlsx` contém apenas pedidos da Atual que também constam na Reserva enviada, sem repetições. Linhas sem pedido não entram nesse arquivo. A Reserva sem duplicatas mantém todos os seus pedidos. O relatório inclui as diferenças e a aba `Atual antes do filtro` para conferência, inclusive das linhas sem pedido.
 - Há downloads separados para as duas planilhas limpas e o relatório com diferenças e linhas removidas, em XLSX. São exportados os valores das abas selecionadas, sem preservar formatação, fórmulas, macros ou demais abas.
 - A mensagem começa com a saudação e o aviso fornecidos pelo usuário, uma única vez. Depois repete Pedido, Data e Cliente para cada pedido somente na Reserva. `{pedido}` usa o número normalizado, `{data}` a coluna A e `{cliente}` a coluna C sem o prefixo "Cliente:". `{A}`, `{B}`, `{C}` etc. usam os valores originais da linha na Reserva. A introdução e o bloco podem ser editados na aplicação. A comparação não aplica filtro adicional de idade da reserva.
 - Nenhuma reserva é excluída de um sistema externo.

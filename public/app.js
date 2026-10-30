@@ -85,10 +85,11 @@ $('reserva').addEventListener('change', () => carregar('reserva'));
 ['abaAtual', 'abaReserva'].forEach(id => $(id).addEventListener('change', () => { invalidar(); status('Aba alterada. Clique em Comparar pedidos novamente.'); }));
 $('comparar').addEventListener('click', comparar);
 ['introducao', 'modelo'].forEach(id => $(id).addEventListener('input', atualizarTexto));
-$('baixarAtual').addEventListener('click', () => baixarXlsx('atual_sem_duplicatas.xlsx', [['Atual', dadosAtual.header, resultado.atual]]));
+$('baixarAtual').addEventListener('click', () => baixarXlsx('atual_sem_duplicatas.xlsx', [['Atual', dadosAtual.header, resultado.atualNaReserva]]));
 $('baixarReserva').addEventListener('click', () => baixarXlsx('reserva_sem_duplicatas.xlsx', [['Reserva', dadosReserva.header, resultado.reserva]]));
 $('baixarComparacao').addEventListener('click', () => baixarXlsx('comparacao.xlsx', [
-  ['Atual sem duplicatas', dadosAtual.header, resultado.atual], ['Reserva sem duplicatas', dadosReserva.header, resultado.reserva],
+  ['Atual sem duplicatas', dadosAtual.header, resultado.atualNaReserva], ['Reserva sem duplicatas', dadosReserva.header, resultado.reserva],
+  ['Atual antes do filtro', dadosAtual.header, resultado.atual],
   ['Somente na Reserva', dadosReserva.header, resultado.somenteReserva], ['Somente na Atual', dadosAtual.header, resultado.somenteAtual],
   ['Removidas da Atual', dadosAtual.header, resultado.removidasAtual], ['Removidas da Reserva', dadosReserva.header, resultado.removidasReserva]]));
 $('baixarTexto').addEventListener('click', () => {

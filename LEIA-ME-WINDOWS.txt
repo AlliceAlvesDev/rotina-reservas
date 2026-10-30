@@ -17,6 +17,8 @@ ROTINA DE RESERVAS - WINDOWS - SEM PYTHON
    a coluna B identifica o pedido e a aba padrao da Reserva e modelo.
 
 5. Baixe as planilhas sem repeticoes e a comparacao em XLSX.
+   A Atual exportada inclui apenas pedidos presentes na Reserva enviada.
+   O relatorio preserva as diferencas e a Atual antes desse filtro.
    Copie ou baixe a mensagem preenchida para os pedidos somente
    na Reserva. A introducao aparece uma vez, seguida dos pedidos.
 

@@ -23,7 +23,8 @@
     const a = limpar(atual), r = limpar(reserva);
     const ak = new Set(a.clean.map(row => pedido(row[1])));
     const rk = new Set(r.clean.map(row => pedido(row[1])));
-    return {atual: a.clean, reserva: r.clean, removidasAtual: a.removed, removidasReserva: r.removed,
+    return {atual: a.clean, atualNaReserva: a.clean.filter(row => pedido(row[1]) && rk.has(pedido(row[1]))),
+      reserva: r.clean, removidasAtual: a.removed, removidasReserva: r.removed,
       somenteReserva: r.clean.filter(row => pedido(row[1]) && !ak.has(pedido(row[1]))),
       somenteAtual: a.clean.filter(row => pedido(row[1]) && !rk.has(pedido(row[1]))), vazias: a.empty + r.empty};
   }
