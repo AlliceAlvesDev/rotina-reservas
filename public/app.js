@@ -19,7 +19,7 @@ async function carregar(tipo) {
     status('Lendo planilha…');
     const buffer = await file.arrayBuffer();
     if (revisoes[tipo] !== revision) return;
-    const book = XLSX.read(buffer, {type: 'array', sheetRows: 100002});
+    const book = XLSX.read(buffer, {type: 'array'});
     if (!book.SheetNames.length) throw new Error('O arquivo não contém abas.');
     livros[tipo] = book;
     book.SheetNames.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; select.append(option); });
@@ -30,13 +30,7 @@ async function carregar(tipo) {
   $('comparar').disabled = !(livros.atual && livros.reserva);
 }
 function ler(book, name) {
-  const sheet = book.Sheets[name];
-  const range = sheet['!fullref'] || sheet['!ref'];
-  if (range) { const r = XLSX.utils.decode_range(range); if (r.e.r > 100000 || r.e.c > 999) throw new Error('A aba excede o limite de 100 mil linhas ou mil colunas.'); }
-  const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: false, defval: '', blankrows: false});
-  if (!rows.length || rows[0].length < 2) throw new Error('A aba deve ter cabeçalhos e pelo menos duas colunas.');
-  const header = rows[0];
-  return {header, rows: rows.slice(1).filter(row => row.some(cell => String(cell).trim() !== ''))};
+  return Reservas.lerAba(XLSX, book, name);
 }
 function tabela(id, data, rows) {
   const target = $(id); target.replaceChildren();

@@ -3,6 +3,29 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const R = require('../public/reservas.js');
 const X = require('../public/vendor/xlsx.full.min.js');
+test('ignora dimensoes e celulas vazias de formatacao fora da tabela real', () => {
+  const sheet = X.utils.aoa_to_sheet([['Data', 'Pedido', 'Cliente'], ['01/10/26', '00123', 'Exemplo'], ['', '', ''], ['02/10/26', '456', 'Outro']]);
+  sheet['!ref'] = 'A1:XFD1048576';
+  sheet.XFD1048576 = {t: 'z', s: {}};
+  sheet.Z1000000 = {t: 's', v: ''};
+  sheet.Z999999 = {t: 's', v: '  '};
+  const book = {Sheets: {modelo: sheet}};
+  const data = R.lerAba(X, book, 'modelo');
+  assert.deepEqual(data.header, ['Data', 'Pedido', 'Cliente']);
+  assert.deepEqual(data.rows.map(row => row[1]), ['00123', '456']);
+  assert.equal(sheet['!ref'], 'A1:XFD1048576');
+});
+test('mantem limites para dados reais sem ocultar pedidos distantes', () => {
+  for (const address of ['B100002', 'XFD2']) {
+    const sheet = X.utils.aoa_to_sheet([['Data', 'Pedido'], ['data', '123']]);
+    sheet[address] = {t: 's', v: '456'};
+    assert.throws(() => R.lerAba(X, {Sheets: {modelo: sheet}}, 'modelo'), /contém dados além do limite/);
+  }
+  const sheet = X.utils.aoa_to_sheet([['Data', 'Pedido'], ['data', '123']]);
+  sheet.B100002 = {t: 'n', f: '1+1'};
+  assert.throws(() => R.lerAba(X, {Sheets: {modelo: sheet}}, 'modelo'), /contém dados além do limite/);
+  assert.throws(() => R.lerAba(X, {Sheets: {modelo: {}}}, 'modelo'), /cabeçalhos/);
+});
 test('identifica pedidos numericos sem perder precisao', () => {
   for (const v of [' 00 123 ', '123.0', 123]) assert.equal(R.pedido(v), '123');
   assert.equal(R.pedido('12345678901234567890'), '12345678901234567890');

@@ -2,6 +2,29 @@
   'use strict';
   const INTRO = 'Bom dia!\n\nFavor verificar o pedido abaixo, pois o mesmo está segurando reserva há mais de 10 dias.';
   const MODELO = 'Pedido: {pedido}\nData: {data}\nCliente: {cliente}';
+  function lerAba(XLSX, book, name) {
+    const sheet = book.Sheets[name];
+    if (!sheet) throw new Error('A aba selecionada não existe.');
+    // Exportadores podem declarar a planilha inteira como usada, mesmo vazia.
+    // Examine as celulas armazenadas, sem percorrer esse retangulo declarado.
+    let lastRow = -1, lastColumn = -1;
+    for (const address of Object.keys(sheet)) {
+      if (!/^[A-Z]+[1-9]\d*$/.test(address)) continue;
+      const cell = sheet[address];
+      if (!cell || cell.t === 'z') continue;
+      if (!cell.f && (cell.v == null || String(cell.v).trim() === '')) continue;
+      const position = XLSX.utils.decode_cell(address);
+      lastRow = Math.max(lastRow, position.r);
+      lastColumn = Math.max(lastColumn, position.c);
+      if (lastRow > 100000 || lastColumn > 999) {
+        throw new Error('A aba contém dados além do limite de 100 mil linhas ou mil colunas.');
+      }
+    }
+    if (lastRow < 0 || lastColumn < 1) throw new Error('A aba deve ter cabeçalhos e pelo menos duas colunas.');
+    const rows = XLSX.utils.sheet_to_json(sheet, {range: {s: {r: 0, c: 0}, e: {r: lastRow, c: lastColumn}}, header: 1, raw: false, defval: '', blankrows: false});
+    if (!rows.length || rows[0].length < 2) throw new Error('A aba deve ter cabeçalhos e pelo menos duas colunas.');
+    return {header: rows[0], rows: rows.slice(1).filter(row => row.some(cell => String(cell).trim() !== ''))};
+  }
   function pedido(value) {
     const text = String(value == null ? '' : value).replace(/\s+/g, '');
     if (!text) return '';
@@ -49,7 +72,7 @@
       return heading + '\n\n' + (intro.trim() ? intro.trim() + '\n\n' : '') + group.blocks.join('\n\n');
     }).join('\n\n========================================\n\n');
   }
-  const api = {INTRO, MODELO, pedido, limpar, comparar, textos};
+  const api = {INTRO, MODELO, lerAba, pedido, limpar, comparar, textos};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Reservas = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
