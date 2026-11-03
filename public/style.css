@@ -268,3 +268,35 @@ input[type="file"]::file-selector-button:hover {
     background: var(--accent);
     color: #ffffff
 }
+
+/* Cards de mensagens por loja e local de origem. */
+.cards-mensagens {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px
+}
+
+.card-mensagem {
+    min-width: 0;
+    padding: 20px;
+    background: #1c1c1c;
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 12px
+}
+
+.card-mensagem h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    overflow-wrap: anywhere
+}
+
+.card-mensagem .muted {
+    margin: 8px 0
+}
+
+@media(max-width:700px) {
+    .cards-mensagens {
+        grid-template-columns: 1fr
+    }
+}

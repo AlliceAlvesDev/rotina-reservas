@@ -51,12 +51,12 @@
       somenteReserva: r.clean.filter(row => pedido(row[1]) && !ak.has(pedido(row[1]))),
       somenteAtual: a.clean.filter(row => pedido(row[1]) && !rk.has(pedido(row[1]))), vazias: a.empty + r.empty};
   }
-  function textos(rows, intro, model) {
+  function gruposTextos(rows, intro, model) {
     const fields = new Set(['pedido', 'data', 'cliente', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']);
     for (const match of model.matchAll(/\{([^{}]+)\}/g)) {
       if (!fields.has(match[1])) throw new Error('Campo desconhecido no modelo: ' + match[1]);
     }
-    if (!rows.length || !model.trim()) return '';
+    if (!rows.length || !model.trim()) return [];
     const groups = new Map();
     rows.forEach(row => {
       const loja = String(row[3] == null ? '' : row[3]).trim();
@@ -69,10 +69,14 @@
     });
     return [...groups.values()].map(group => {
       const heading = 'Loja origem: ' + (group.loja || 'Não informada') + '\nLocal origem: ' + (group.local || 'Não informado');
-      return heading + '\n\n' + (intro.trim() ? intro.trim() + '\n\n' : '') + group.blocks.join('\n\n');
-    }).join('\n\n========================================\n\n');
+      return {loja: group.loja, local: group.local, quantidade: group.blocks.length,
+        texto: heading + '\n\n' + (intro.trim() ? intro.trim() + '\n\n' : '') + group.blocks.join('\n\n')};
+    });
   }
-  const api = {INTRO, MODELO, lerAba, pedido, limpar, comparar, textos};
+  function textos(rows, intro, model) {
+    return gruposTextos(rows, intro, model).map(group => group.texto).join('\n\n========================================\n\n');
+  }
+  const api = {INTRO, MODELO, lerAba, pedido, limpar, comparar, gruposTextos, textos};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Reservas = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

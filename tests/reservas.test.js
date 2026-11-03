@@ -96,6 +96,15 @@ test('separa mensagens pela combinacao loja D e local E com introducao por canal
   assert.ok(groups[2].includes('Pedido: 103\n'));
   assert.equal(text.split('Bom dia!').length - 1, 3);
   assert.equal(text.split('Pedido: ').length - 1, 4);
+  const cards = R.gruposTextos(rows, R.INTRO, R.MODELO);
+  assert.deepEqual(cards.map(({loja, local, quantidade}) => ({loja, local, quantidade})), [
+    {loja: '0001', local: '28', quantidade: 2},
+    {loja: '0001', local: '58', quantidade: 1},
+    {loja: '0002', local: '28', quantidade: 1},
+  ]);
+  assert.deepEqual(cards.map(card => card.texto), groups);
+  assert.deepEqual(R.gruposTextos([], R.INTRO, R.MODELO), []);
+  assert.deepEqual(R.gruposTextos(rows, R.INTRO, ''), []);
   assert.equal(R.textos(rows, '', 'Pedido {pedido} / {D} / {E}').includes('Bom dia!'), false);
 });
 test('campos de origem vazios sao identificados sem perder pedidos', () => {

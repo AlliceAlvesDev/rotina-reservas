@@ -43,8 +43,28 @@ function tabela(id, data, rows) {
 }
 function atualizarTexto() {
   if (!resultado) return;
+  $('cardsMensagens').replaceChildren();
   try {
-    $('texto').value = Reservas.textos(resultado.somenteReserva, $('introducao').value, $('modelo').value);
+    const groups = Reservas.gruposTextos(resultado.somenteReserva, $('introducao').value, $('modelo').value);
+    $('texto').value = groups.map(group => group.texto).join('\n\n========================================\n\n');
+    groups.forEach((group, index) => {
+      const card = document.createElement('article'); card.className = 'card-mensagem';
+      const title = document.createElement('h3');
+      title.textContent = 'Loja ' + (group.loja || 'não informada') + ' · Local ' + (group.local || 'não informado');
+      const count = document.createElement('p'); count.className = 'muted';
+      count.textContent = group.quantidade + (group.quantidade === 1 ? ' pedido' : ' pedidos');
+      const label = document.createElement('label'); label.htmlFor = 'textoCanal' + index; label.textContent = 'Mensagem deste canal';
+      const field = document.createElement('textarea'); field.id = label.htmlFor; field.rows = 12; field.readOnly = true; field.value = group.texto;
+      const actions = document.createElement('div'); actions.className = 'actions';
+      const feedback = document.createElement('p'); feedback.className = 'muted'; feedback.setAttribute('role', 'status');
+      const copy = document.createElement('button'); copy.textContent = 'Copiar mensagem';
+      copy.addEventListener('click', () => copiarMensagem(field, feedback));
+      const download = document.createElement('button'); download.textContent = 'Baixar TXT';
+      const safe = value => (value || 'nao_informado').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60);
+      download.addEventListener('click', () => baixarTxt(group.texto, 'loja_' + safe(group.loja) + '_local_' + safe(group.local) + '.txt'));
+      actions.append(copy, download); card.append(title, count, label, field, actions, feedback);
+      $('cardsMensagens').append(card);
+    });
     $('erroTexto').textContent = resultado.somenteReserva.length ? '' : 'Nenhum pedido somente na Reserva: não há mensagem para gerar.';
   } catch (error) { $('texto').value = ''; $('erroTexto').textContent = error.message; }
   $('baixarTexto').disabled = $('copiar').disabled = !$('texto').value;
@@ -86,11 +106,13 @@ $('baixarComparacao').addEventListener('click', () => baixarXlsx('comparacao.xls
   ['Atual antes do filtro', dadosAtual.header, resultado.atual],
   ['Somente na Reserva', dadosReserva.header, resultado.somenteReserva], ['Somente na Atual', dadosAtual.header, resultado.somenteAtual],
   ['Removidas da Atual', dadosAtual.header, resultado.removidasAtual], ['Removidas da Reserva', dadosReserva.header, resultado.removidasReserva]]));
-$('baixarTexto').addEventListener('click', () => {
-  const url = URL.createObjectURL(new Blob(['\ufeff', $('texto').value], {type: 'text/plain;charset=utf-8'}));
-  const link = document.createElement('a'); link.href = url; link.download = 'textos_para_remocao.txt'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-});
-$('copiar').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText($('texto').value); $('erroTexto').textContent = 'Mensagem copiada.'; }
-  catch (_) { $('erroTexto').textContent = 'Selecione a mensagem e use Ctrl+C para copiar.'; }
-});
+function baixarTxt(text, name) {
+  const url = URL.createObjectURL(new Blob(['\ufeff', text], {type: 'text/plain;charset=utf-8'}));
+  const link = document.createElement('a'); link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+async function copiarMensagem(field, feedback) {
+  try { await navigator.clipboard.writeText(field.value); feedback.textContent = 'Mensagem copiada.'; }
+  catch (_) { field.focus(); field.select(); feedback.textContent = 'Mensagem selecionada. Use Ctrl+C para copiar.'; }
+}
+$('baixarTexto').addEventListener('click', () => baixarTxt($('texto').value, 'textos_para_remocao.txt'));
+$('copiar').addEventListener('click', () => copiarMensagem($('texto'), $('erroTexto')));
