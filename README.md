@@ -12,7 +12,7 @@ Arquivos da versão sem Python: `iniciar.bat`, `Servidor-Reservas.ps1` e `public
 
 ## Regras
 
-- A primeira linha contém cabeçalhos; o pedido está na coluna B.
+- A primeira linha contém cabeçalhos. Na Atual, o pedido está na coluna B. A Reserva nova usa somente AF (`dt_alteracao`), AI (`nr_doc_origem`), AL (`observacao`), AP (`cgc_f_loja_origem`) e AQ (`cd_local_origem`). Essas colunas são convertidas, nessa ordem, em A–E na Reserva processada e nos downloads. Datas numéricas da nova exportação são formatadas em dia/mês/ano e hora. O modelo antigo A–E continua aceito.
 - Números inteiros, texto numérico, espaços e zeros à esquerda são normalizados para comparação. A primeira linha de cada pedido é mantida.
 - Linhas sem pedido são preservadas e sinalizadas; não entram na comparação. Pedidos inválidos interrompem a operação para evitar usar uma coluna incorreta.
 - Somente na Reserva e somente na Atual são calculados depois da deduplicação, usando os arquivos enviados antes do filtro de exportação.

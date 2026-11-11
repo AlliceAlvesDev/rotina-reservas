@@ -31,6 +31,38 @@
     if (!/^\+?\d+(?:\.0+)?$/.test(text)) throw new Error('A coluna B contém um pedido inválido: ' + text.slice(0, 50) + '. Confira a aba selecionada.');
     return BigInt(text.replace(/\.0+$/, '')).toString();
   }
+  function lerReserva(XLSX, book, name) {
+    const source = book.Sheets[name];
+    if (!source) throw new Error('A aba selecionada não existe.');
+    const headers = ['dt_alteracao', 'nr_doc_origem', 'observacao', 'cgc_f_loja_origem', 'cd_local_origem'];
+    const novo = ['AF', 'AI', 'AL', 'AP', 'AQ'];
+    const antigo = ['A', 'B', 'C', 'D', 'E'];
+    const matches = columns => columns.every((column, i) => String(source[column + '1']?.v ?? '').trim().toLowerCase() === headers[i]);
+    const isNew = matches(novo);
+    if (!isNew && !matches(antigo)) {
+      throw new Error('A aba da Reserva não corresponde ao modelo. Selecione a aba com Data em AF, Pedido em AI, Cliente em AL, Loja em AP e Local em AQ (ou o modelo antigo A–E).');
+    }
+    const columns = isNew ? novo : antigo;
+    const positions = new Map(columns.map((column, i) => [XLSX.utils.decode_col(column), i]));
+    const sheet = {};
+    let lastRow = 0;
+    for (const address of Object.keys(source)) {
+      if (!/^[A-Z]+[1-9]\d*$/.test(address)) continue;
+      const position = XLSX.utils.decode_cell(address);
+      if (!positions.has(position.c)) continue;
+      const target = positions.get(position.c);
+      const cell = source[address];
+      if (!cell) continue;
+      // A exportacao nova usa mes/dia na formatacao, mas guarda datas Excel.
+      const value = isNew && target === 0 && position.r > 0 && cell.t === 'n' && Number.isFinite(cell.v)
+        ? {...cell, w: XLSX.SSF.format('dd/mm/yy hh:mm', cell.v, {date1904: !!book.Workbook?.WBProps?.date1904})}
+        : {...cell};
+      sheet[XLSX.utils.encode_cell({r: position.r, c: target})] = value;
+      lastRow = Math.max(lastRow, position.r);
+    }
+    sheet['!ref'] = 'A1:E' + (lastRow + 1);
+    return lerAba(XLSX, {Sheets: {reserva: sheet}}, 'reserva');
+  }
   function limpar(rows) {
     const seen = new Set(), clean = [], removed = [];
     let empty = 0;
@@ -76,7 +108,7 @@
   function textos(rows, intro, model) {
     return gruposTextos(rows, intro, model).map(group => group.texto).join('\n\n========================================\n\n');
   }
-  const api = {INTRO, MODELO, lerAba, pedido, limpar, comparar, gruposTextos, textos};
+  const api = {INTRO, MODELO, lerAba, lerReserva, pedido, limpar, comparar, gruposTextos, textos};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Reservas = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

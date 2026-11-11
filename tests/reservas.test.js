@@ -3,6 +3,35 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const R = require('../public/reservas.js');
 const X = require('../public/vendor/xlsx.full.min.js');
+test('Reserva nova seleciona somente AF AI AL AP AQ com data brasileira e zeros da loja', () => {
+  const sheet = {};
+  const columns = ['AF', 'AI', 'AL', 'AP', 'AQ'];
+  const headers = ['dt_alteracao', 'nr_doc_origem', 'observacao', 'cgc_f_loja_origem', 'cd_local_origem'];
+  columns.forEach((column, i) => { sheet[column + '1'] = {t: 's', v: headers[i]}; });
+  sheet.AF2 = {t: 'n', v: 46323.5, w: '10/28/26 12:00'};
+  sheet.AI2 = {t: 'n', v: 123};
+  sheet.AL2 = {t: 's', v: 'Cliente: Exemplo'};
+  sheet.AP2 = {t: 's', v: '0006'};
+  sheet.AQ2 = {t: 'n', v: 58};
+  sheet.A2 = {t: 's', v: 'Artigo ignorado'};
+  sheet.A3 = {t: 's', v: 'Linha sem dados selecionados'};
+  sheet['!ref'] = 'A1:AQ1048576';
+  const before = JSON.stringify(sheet);
+  const data = R.lerReserva(X, {Sheets: {exportacao: sheet}}, 'exportacao');
+  assert.deepEqual(data.header, headers);
+  assert.deepEqual(data.rows, [['28/10/26 12:00', '123', 'Cliente: Exemplo', '0006', '58']]);
+  assert.equal(JSON.stringify(sheet), before);
+  const groups = R.gruposTextos(R.comparar([], data.rows).somenteReserva, R.INTRO, R.MODELO);
+  assert.equal(groups[0].loja, '0006'); assert.equal(groups[0].local, '58');
+  assert.ok(groups[0].texto.includes('Data: 28/10/26 12:00'));
+  delete sheet.AQ1;
+  assert.throws(() => R.lerReserva(X, {Sheets: {exportacao: sheet}}, 'exportacao'), /não corresponde ao modelo/);
+});
+test('Reserva antiga continua compativel com a leitura A a E', () => {
+  const rows = [['dt_alteracao', 'nr_doc_origem', 'observacao', 'cgc_f_loja_origem', 'cd_local_origem'], ['01/10/26', '123', 'Cliente: Exemplo', '0001', '69']];
+  const book = {Sheets: {modelo: X.utils.aoa_to_sheet(rows)}};
+  assert.deepEqual(R.lerReserva(X, book, 'modelo'), {header: rows[0], rows: [rows[1]]});
+});
 test('ignora dimensoes e celulas vazias de formatacao fora da tabela real', () => {
   const sheet = X.utils.aoa_to_sheet([['Data', 'Pedido', 'Cliente'], ['01/10/26', '00123', 'Exemplo'], ['', '', ''], ['02/10/26', '456', 'Outro']]);
   sheet['!ref'] = 'A1:XFD1048576';

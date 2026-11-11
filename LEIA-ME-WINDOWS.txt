@@ -14,7 +14,9 @@ ROTINA DE RESERVAS - WINDOWS - SEM PYTHON
 
 4. Selecione Atual e Reserva (XLS, XLSX ou ODS), confira as abas
    e clique em Comparar pedidos. A primeira linha e cabecalho,
-   a coluna B identifica o pedido e a aba padrao da Reserva e modelo.
+   na Atual o pedido esta em B. A Reserva nova usa somente AF (data),
+   AI (pedido), AL (cliente), AP (loja) e AQ (local). O modelo antigo
+   A a E tambem e aceito. Confira a aba com os dados da exportacao.
 
 5. Baixe as planilhas sem repeticoes e a comparacao em XLSX.
    A Atual exportada inclui apenas pedidos presentes na Reserva enviada.

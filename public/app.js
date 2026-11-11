@@ -72,7 +72,7 @@ function atualizarTexto() {
 function comparar() {
   invalidar();
   try {
-    dadosAtual = ler(livros.atual, $('abaAtual').value); dadosReserva = ler(livros.reserva, $('abaReserva').value);
+    dadosAtual = ler(livros.atual, $('abaAtual').value); dadosReserva = Reservas.lerReserva(XLSX, livros.reserva, $('abaReserva').value);
     resultado = Reservas.comparar(dadosAtual.rows, dadosReserva.rows);
     const metrics = $('metricas'); metrics.replaceChildren();
     [['Repetidas na Atual', resultado.removidasAtual.length], ['Repetidas na Reserva', resultado.removidasReserva.length], ['Somente na Reserva', resultado.somenteReserva.length], ['Somente na Atual', resultado.somenteAtual.length]].forEach(([name, count]) => {
